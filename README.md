@@ -11,7 +11,7 @@ for lossless text data compression.
 
 ## Team Members 
 1 Roberaf Tamirat 
-2 Marcimoy Assefa 
+2 Marsimoy Tesfaye 
 3 Mahlet Eyasu 
 4 Bereket Yonatan 
 5 feven Asefa
