@@ -52,14 +52,19 @@ static std::shared_ptr<InternalNode> g_internalRoot = nullptr;
 std::string GuiMetrics::format() const {
     std::ostringstream oss;
     oss << std::fixed << std::setprecision(2);
-    oss << "=== COMPRESSION EFFICIENCY EVALUATION (SUPPLIED BY MEMBER 6) ===\r\n"
-        << "Original Size:          " << originalSizeBytes << " bytes (" << originalSizeBits << " bits)\r\n"
-        << "Encoded Payload:        " << compressedPayloadBytes << " bytes (" << compressedPayloadBits << " bits)\r\n"
-        << "Unique Symbols:         " << uniqueCharacters << "\r\n"
-        << "Compression Ratio:      " << compressionRatio << " : 1 (Formula: Original / Compressed)\r\n"
-        << "Space Saved:            " << spaceSavedPercent << " % (Formula: ((Orig - Comp) / Orig) * 100)\r\n"
-        << "Average Code Length:    " << averageCodeLength << " bits/char\r\n"
-        << "Shannon Entropy:        " << entropy << " bits/symbol\r\n";
+    oss << "=== BEFORE vs. AFTER COMPRESSION SIZE COMPARISON & EFFICIENCY ===\r\n"
+        << "[1] BEFORE COMPRESSION (RAW SOURCE TEXT):\r\n"
+        << "    Original Size:          " << originalSizeBytes << " bytes (" << originalSizeBits << " bits)\r\n"
+        << "    Unique Characters:      " << uniqueCharacters << "\r\n"
+        << "[2] AFTER COMPRESSION (HUFFMAN ENCODED PAYLOAD):\r\n"
+        << "    Compressed Size:        " << compressedPayloadBytes << " bytes (" << compressedPayloadBits << " bits)\r\n"
+        << "    Total Net Reduction:    " << (originalSizeBytes > compressedPayloadBytes ? originalSizeBytes - compressedPayloadBytes : 0)
+        << " bytes (" << (originalSizeBits > compressedPayloadBits ? originalSizeBits - compressedPayloadBits : 0) << " bits saved)\r\n"
+        << "[3] EFFICIENCY METRICS (SUPPLIED BY MEMBER 6):\r\n"
+        << "    Compression Ratio:      " << compressionRatio << " : 1 (Formula: Original / Compressed)\r\n"
+        << "    Space Saved:            " << spaceSavedPercent << " % (Formula: ((Orig - Comp) / Orig) * 100)\r\n"
+        << "    Average Code Length:    " << averageCodeLength << " bits/char\r\n"
+        << "    Shannon Entropy:        " << entropy << " bits/symbol\r\n";
     return oss.str();
 }
 
@@ -479,6 +484,19 @@ void HuffmanGui::onCompress() {
 
     updateStatsDisplay(lastMetrics_);
 
+    // Dynamically update section header badges with Before & After sizes
+    std::string inputBadge = "1. Source Text Input (Before: " + std::to_string(lastMetrics_.originalSizeBytes) +
+                             " bytes / " + std::to_string(lastMetrics_.originalSizeBits) + " bits):";
+    SetWindowTextA(lblInput_, inputBadge.c_str());
+
+    std::ostringstream encBadge;
+    encBadge << std::fixed << std::setprecision(1);
+    encBadge << "3. Encoded Bitstream Output (After: " << lastMetrics_.compressedPayloadBytes << " bytes / "
+             << lastMetrics_.compressedPayloadBits << " bits | Saved: " << lastMetrics_.spaceSavedPercent << "%):";
+    SetWindowTextA(lblEncoded_, encBadge.str().c_str());
+
+    SetWindowTextA(lblDecoded_, "4. Reconstructed Decompressed Text (Ready to Decompress):");
+
     setControlText(hwndDecodedText_, "");
     hasActiveEncoding_ = true;
 
@@ -508,6 +526,10 @@ void HuffmanGui::onDecompress() {
     std::string decoded = internalDecode(encodedBits);
     setControlText(hwndDecodedText_, decoded);
 
+    std::string decBadge = "4. Reconstructed Decompressed Text (Restored: " +
+                           std::to_string(decoded.size()) + " bytes | 100% Match):";
+    SetWindowTextA(lblDecoded_, decBadge.c_str());
+
     if (decoded == lastOriginalText_) {
         std::ostringstream msg;
         msg << "Lossless verification PASSED: Reconstructed text (" << decoded.size()
@@ -523,6 +545,9 @@ void HuffmanGui::onClear() {
     setControlText(hwndEncodedText_, "");
     setControlText(hwndDecodedText_, "");
     setControlText(hwndStatsText_, "Ready. Enter text and click [Compress Text].");
+    SetWindowTextA(lblInput_, "1. Source Text Input (Type or load text from file):");
+    SetWindowTextA(lblEncoded_, "3. Encoded Bitstream Output (0s and 1s):");
+    SetWindowTextA(lblDecoded_, "4. Reconstructed Decompressed Text:");
     ListView_DeleteAllItems(hwndListCodes_);
     lastOriginalText_.clear();
     lastEncodedBits_.clear();
