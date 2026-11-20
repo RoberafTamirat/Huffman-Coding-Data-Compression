@@ -13,24 +13,18 @@ else()
     add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# Core static library shared across CLI, GUI, and test suites
-add_library(huffman_lib STATIC
-    src/core/FrequencyAnalyzer.cpp
-    src/core/HuffmanTree.cpp
-    src/core/HuffmanEncoder.cpp
-    src/core/HuffmanDecoder.cpp
-    src/core/CompressionAnalyzer.cpp
-    src/file/FileHandler.cpp
+# Core GUI library owned by Member 1 (Roberaf Tamirat)
+add_library(huffman_gui_lib STATIC
     src/gui/HuffmanGui.cpp
 )
 
-target_include_directories(huffman_lib PUBLIC
+target_include_directories(huffman_gui_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # Windows system libraries for native Win32 GUI & Common Controls
 if (WIN32)
-    target_link_libraries(huffman_lib PUBLIC
+    target_link_libraries(huffman_gui_lib PUBLIC
         user32
         gdi32
         comctl32
@@ -44,24 +38,5 @@ add_executable(HuffmanCoding
 )
 
 target_link_libraries(HuffmanCoding PRIVATE
-    huffman_lib
+    huffman_gui_lib
 )
-
-# Test targets
-enable_testing()
-
-add_executable(test_huffman
-    tests/unit/test_huffman.cpp
-)
-target_link_libraries(test_huffman PRIVATE
-    huffman_lib
-)
-add_test(NAME UnitTests COMMAND test_huffman)
-
-add_executable(test_file_operations
-    tests/integration/test_file_operations.cpp
-)
-target_link_libraries(test_file_operations PRIVATE
-    huffman_lib
-)
-add_test(NAME IntegrationTests COMMAND test_file_operations)

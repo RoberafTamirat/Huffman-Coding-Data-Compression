@@ -10,32 +10,44 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 #include <memory>
+#include <cstdint>
 
-// Integrated modules from team members
-#include "core/FrequencyAnalyzer.h"   // Member 2: Marcimoy Assefa
-#include "core/HuffmanNode.h"          // Member 3: Feven Asefa
-#include "core/HuffmanTree.h"          // Member 3: Feven Asefa
-#include "core/HuffmanEncoder.h"       // Member 4: Mahlet Eyasu
-#include "core/HuffmanDecoder.h"       // Member 5: Hermela Tadios
-#include "file/FileHandler.h"          // Member 5: Hermela Tadios
-#include "core/CompressionAnalyzer.h"  // Member 6: Bereket Yonatan
+/**
+ * @brief Compression evaluation metrics structure for GUI display.
+ * Designed to receive metrics supplied by Member 6 (Bereket Yonatan).
+ */
+struct GuiMetrics {
+    size_t originalSizeBytes{0};
+    size_t originalSizeBits{0};
+    size_t compressedPayloadBytes{0};
+    size_t compressedPayloadBits{0};
+    size_t uniqueCharacters{0};
+    double compressionRatio{0.0};
+    double spaceSavedPercent{0.0};
+    double averageCodeLength{0.0};
+    double entropy{0.0};
+
+    [[nodiscard]] std::string format() const;
+};
 
 /**
  * @file HuffmanGui.h
  * @brief Graphical User Interface for the Huffman Coding Data Compression application.
- * @author Member 1: Roberaf Tamirat (GUI Developer & Integration Coordinator)
+ * @author Member 1: Roberaf Tamirat (Role 1: GUI Developer & Integration Coordinator)
  *
  * Responsibilities:
- *  - Design simple, understandable desktop interface.
- *  - Text input area & file loading.
- *  - Compress button & Decompress button.
- *  - Display Huffman codes table.
- *  - Display encoded bitstream.
- *  - Display decompressed original text with 100% lossless verification.
- *  - Display compression statistics supplied by Member 6.
- *  - Input validation and error handling.
- *  - Module integration coordinator.
+ *  - Design simple and understandable desktop interface (Task 1).
+ *  - Text input area (Task 2).
+ *  - Compress button (Task 3).
+ *  - Decompress button (Task 4).
+ *  - Display generated Huffman codes table (Task 5).
+ *  - Display encoded bitstream output (Task 6).
+ *  - Display decompressed original text (Task 7).
+ *  - Display compression statistics supplied by Member 6 (Task 8).
+ *  - Basic input validation and error dialogs (Task 9).
+ *  - Integration coordinator providing hooks for team members' modules (Task 10).
  */
 class HuffmanGui {
 public:
@@ -68,7 +80,7 @@ private:
     // UI population helpers
     void populateCodesTable(const std::unordered_map<unsigned char, std::string>& codes,
                             const std::unordered_map<unsigned char, size_t>& freqs);
-    void updateStatsDisplay(const CompressionMetrics& metrics);
+    void updateStatsDisplay(const GuiMetrics& metrics);
     void setStatus(const std::string& message, bool isError = false);
     void showError(const std::string& message, const std::string& title = "Validation Notice");
 
@@ -100,18 +112,16 @@ private:
     HFONT hFontBold_{nullptr};
 #endif
 
-    // Team member modules integrated by Coordinator (Roberaf)
-    FrequencyAnalyzer frequencyAnalyzer_; // Member 2
-    HuffmanTree huffmanTree_;             // Member 3
-    HuffmanEncoder encoder_;              // Member 4
-    HuffmanDecoder decoder_;              // Member 5
-    FileHandler fileHandler_;             // Member 5
+    // Internal coordinator engine for standalone GUI execution prior to team merge
+    void internalAnalyze(const std::string& text);
+    std::string internalEncode(const std::string& text);
+    std::string internalDecode(const std::string& bitString);
 
-    // State for encode/decode roundtrip
+    // State
     std::string lastOriginalText_;
     std::string lastEncodedBits_;
     std::unordered_map<unsigned char, std::string> currentCodes_;
     std::unordered_map<unsigned char, size_t> currentFrequencies_;
-    CompressionMetrics lastMetrics_;
+    GuiMetrics lastMetrics_;
     bool hasActiveEncoding_{false};
 };

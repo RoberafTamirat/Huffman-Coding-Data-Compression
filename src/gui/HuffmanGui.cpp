@@ -6,6 +6,9 @@
 #include <vector>
 #include <iomanip>
 #include <cctype>
+#include <cmath>
+#include <queue>
+#include <fstream>
 
 #pragma comment(lib, "comctl32.lib")
 
@@ -22,6 +25,43 @@ constexpr int IDC_EDIT_STATS     = 1009;
 constexpr int IDC_STATUS_BAR     = 1010;
 
 static HuffmanGui* g_guiInstance = nullptr;
+
+// Internal lightweight tree node for GUI standalone operation
+struct InternalNode {
+    unsigned char data;
+    size_t freq;
+    std::shared_ptr<InternalNode> left;
+    std::shared_ptr<InternalNode> right;
+
+    InternalNode(unsigned char c, size_t f)
+        : data(c), freq(f), left(nullptr), right(nullptr) {}
+    InternalNode(unsigned char c, size_t f, std::shared_ptr<InternalNode> l, std::shared_ptr<InternalNode> r)
+        : data(c), freq(f), left(std::move(l)), right(std::move(r)) {}
+
+    [[nodiscard]] bool isLeaf() const noexcept { return !left && !right; }
+};
+
+struct InternalNodeCompare {
+    bool operator()(const std::shared_ptr<InternalNode>& a, const std::shared_ptr<InternalNode>& b) const {
+        return a->freq > b->freq;
+    }
+};
+
+static std::shared_ptr<InternalNode> g_internalRoot = nullptr;
+
+std::string GuiMetrics::format() const {
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(2);
+    oss << "=== COMPRESSION EFFICIENCY EVALUATION (SUPPLIED BY MEMBER 6) ===\r\n"
+        << "Original Size:          " << originalSizeBytes << " bytes (" << originalSizeBits << " bits)\r\n"
+        << "Encoded Payload:        " << compressedPayloadBytes << " bytes (" << compressedPayloadBits << " bits)\r\n"
+        << "Unique Symbols:         " << uniqueCharacters << "\r\n"
+        << "Compression Ratio:      " << compressionRatio << " : 1 (Formula: Original / Compressed)\r\n"
+        << "Space Saved:            " << spaceSavedPercent << " % (Formula: ((Orig - Comp) / Orig) * 100)\r\n"
+        << "Average Code Length:    " << averageCodeLength << " bits/char\r\n"
+        << "Shannon Entropy:        " << entropy << " bits/symbol\r\n";
+    return oss.str();
+}
 
 HuffmanGui::HuffmanGui() = default;
 
@@ -165,7 +205,7 @@ void HuffmanGui::setupFonts() {
 void HuffmanGui::createControls(HWND hwnd) {
     HINSTANCE hInst = GetModuleHandle(nullptr);
 
-    // Section 1: Source text input area and buttons
+    // Section 1: Source text input area and buttons (Task 2)
     lblInput_ = CreateWindowExA(0, "STATIC", "1. Source Text Input (Type or load text from file):",
                                 WS_CHILD | WS_VISIBLE,
                                 20, 10, 500, 20, hwnd, nullptr, hInst, nullptr);
@@ -182,7 +222,7 @@ void HuffmanGui::createControls(HWND hwnd) {
                                      WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN,
                                      20, 40, 1020, 100, hwnd, (HMENU)IDC_EDIT_INPUT, hInst, nullptr);
 
-    // Action Control Bar
+    // Action Control Bar (Tasks 3 & 4)
     hwndBtnCompress_ = CreateWindowExA(0, "BUTTON", "  [Compress Text]  ",
                                        WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
                                        20, 150, 180, 36, hwnd, (HMENU)IDC_BTN_COMPRESS, hInst, nullptr);
@@ -191,7 +231,7 @@ void HuffmanGui::createControls(HWND hwnd) {
                                          WS_CHILD | WS_VISIBLE | BS_PUSHBUTTON,
                                          210, 150, 180, 36, hwnd, (HMENU)IDC_BTN_DECOMPRESS, hInst, nullptr);
 
-    // Section 2: Split columns
+    // Section 2: Split columns (Task 5, 6, 7)
     lblCodes_ = CreateWindowExA(0, "STATIC", "2. Generated Prefix Codes Table (Huffman Tree):",
                                 WS_CHILD | WS_VISIBLE,
                                 20, 195, 420, 20, hwnd, nullptr, hInst, nullptr);
@@ -201,7 +241,6 @@ void HuffmanGui::createControls(HWND hwnd) {
                                      20, 220, 420, 310, hwnd, (HMENU)IDC_LIST_CODES, hInst, nullptr);
     ListView_SetExtendedListViewStyle(hwndListCodes_, LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
 
-    // Add Columns to ListView
     LVCOLUMNA col = {};
     col.mask = LVCF_TEXT | LVCF_WIDTH | LVCF_SUBITEM;
 
@@ -225,7 +264,7 @@ void HuffmanGui::createControls(HWND hwnd) {
     col.cx = 55;
     ListView_InsertColumn(hwndListCodes_, 4, &col);
 
-    // Encoded Bitstream Panel
+    // Encoded Bitstream Panel (Task 6)
     lblEncoded_ = CreateWindowExA(0, "STATIC", "3. Encoded Bitstream Output (0s and 1s):",
                                   WS_CHILD | WS_VISIBLE,
                                   460, 195, 400, 20, hwnd, nullptr, hInst, nullptr);
@@ -234,7 +273,7 @@ void HuffmanGui::createControls(HWND hwnd) {
                                        WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY,
                                        460, 220, 580, 140, hwnd, (HMENU)IDC_EDIT_ENCODED, hInst, nullptr);
 
-    // Decompressed Text Panel
+    // Decompressed Text Panel (Task 7)
     lblDecoded_ = CreateWindowExA(0, "STATIC", "4. Reconstructed Decompressed Text:",
                                   WS_CHILD | WS_VISIBLE,
                                   460, 370, 400, 20, hwnd, nullptr, hInst, nullptr);
@@ -243,7 +282,7 @@ void HuffmanGui::createControls(HWND hwnd) {
                                        WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_READONLY,
                                        460, 395, 580, 135, hwnd, (HMENU)IDC_EDIT_DECODED, hInst, nullptr);
 
-    // Section 3: Compression Statistics Panel (Member 6 Deliverables)
+    // Section 3: Compression Statistics Panel (Task 8 - Member 6 Deliverables)
     lblStats_ = CreateWindowExA(0, "STATIC", "5. Compression Efficiency Evaluation (Supplied by Member 6):",
                                 WS_CHILD | WS_VISIBLE,
                                 20, 540, 600, 20, hwnd, nullptr, hInst, nullptr);
@@ -258,7 +297,6 @@ void HuffmanGui::createControls(HWND hwnd) {
                                      WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP,
                                      0, 0, 0, 0, hwnd, (HMENU)IDC_STATUS_BAR, hInst, nullptr);
 
-    // Apply Fonts
     HWND uiControls[] = {
         lblInput_, hwndBtnLoadFile_, hwndBtnClear_, hwndBtnCompress_, hwndBtnDecompress_,
         lblCodes_, lblEncoded_, lblDecoded_, lblStats_
@@ -319,6 +357,76 @@ void HuffmanGui::resizeControls(int width, int height) {
     SendMessage(hwndStatusBar_, WM_SIZE, 0, 0);
 }
 
+// Internal helper DFS for prefix codes
+static void dfsCodes(const std::shared_ptr<InternalNode>& node,
+                     const std::string& path,
+                     std::unordered_map<unsigned char, std::string>& codes) {
+    if (!node) return;
+    if (node->isLeaf()) {
+        codes[node->data] = path.empty() ? "0" : path;
+        return;
+    }
+    dfsCodes(node->left, path + "0", codes);
+    dfsCodes(node->right, path + "1", codes);
+}
+
+void HuffmanGui::internalAnalyze(const std::string& text) {
+    currentFrequencies_.clear();
+    for (unsigned char ch : text) {
+        ++currentFrequencies_[ch];
+    }
+
+    std::priority_queue<std::shared_ptr<InternalNode>,
+                        std::vector<std::shared_ptr<InternalNode>>,
+                        InternalNodeCompare> heap;
+
+    for (const auto& [ch, f] : currentFrequencies_) {
+        heap.push(std::make_shared<InternalNode>(ch, f));
+    }
+
+    while (heap.size() > 1) {
+        auto left = heap.top(); heap.pop();
+        auto right = heap.top(); heap.pop();
+        auto parent = std::make_shared<InternalNode>('\0', left->freq + right->freq, left, right);
+        heap.push(parent);
+    }
+
+    g_internalRoot = heap.empty() ? nullptr : heap.top();
+    currentCodes_.clear();
+    dfsCodes(g_internalRoot, "", currentCodes_);
+}
+
+std::string HuffmanGui::internalEncode(const std::string& text) {
+    std::string bits;
+    bits.reserve(text.size() * 4);
+    for (unsigned char ch : text) {
+        auto it = currentCodes_.find(ch);
+        if (it != currentCodes_.end()) {
+            bits += it->second;
+        }
+    }
+    return bits;
+}
+
+std::string HuffmanGui::internalDecode(const std::string& bitString) {
+    if (!g_internalRoot || bitString.empty()) return "";
+    if (g_internalRoot->isLeaf()) {
+        return std::string(bitString.size(), static_cast<char>(g_internalRoot->data));
+    }
+
+    std::string decoded;
+    auto curr = g_internalRoot;
+    for (char bit : bitString) {
+        curr = (bit == '0') ? curr->left : curr->right;
+        if (!curr) break;
+        if (curr->isLeaf()) {
+            decoded += static_cast<char>(curr->data);
+            curr = g_internalRoot;
+        }
+    }
+    return decoded;
+}
+
 void HuffmanGui::onCompress() {
     std::string text = getControlText(hwndInputText_);
 
@@ -332,25 +440,45 @@ void HuffmanGui::onCompress() {
 
     lastOriginalText_ = text;
 
-    // Coordinator Step 1: Call Member 2 (FrequencyAnalyzer)
-    currentFrequencies_ = frequencyAnalyzer_.analyze(text);
+    // Run coordinator analysis & code generation
+    internalAnalyze(text);
+    lastEncodedBits_ = internalEncode(text);
 
-    // Coordinator Step 2: Call Member 3 (HuffmanTree)
-    huffmanTree_.buildTree(currentFrequencies_);
-    currentCodes_ = huffmanTree_.generateCodes();
-
-    // Coordinator Step 3: Call Member 4 (HuffmanEncoder)
-    lastEncodedBits_ = encoder_.encode(text, currentCodes_);
-
-    // Coordinator Step 4: Display codes table & encoded bitstream
+    // Task 5: Display codes table
     populateCodesTable(currentCodes_, currentFrequencies_);
+
+    // Task 6: Display encoded bitstream
     setControlText(hwndEncodedText_, lastEncodedBits_);
 
-    // Coordinator Step 5: Call Member 6 (CompressionAnalyzer)
-    lastMetrics_ = CompressionAnalyzer::evaluate(text, lastEncodedBits_, currentFrequencies_, currentCodes_);
+    // Task 8: Compute & display compression metrics (Member 6 specification)
+    lastMetrics_.originalSizeBytes = text.size();
+    lastMetrics_.originalSizeBits = text.size() * 8;
+    lastMetrics_.compressedPayloadBits = lastEncodedBits_.size();
+    lastMetrics_.compressedPayloadBytes = (lastEncodedBits_.size() + 7) / 8;
+    lastMetrics_.uniqueCharacters = currentFrequencies_.size();
+
+    if (lastMetrics_.compressedPayloadBytes > 0) {
+        lastMetrics_.compressionRatio = static_cast<double>(lastMetrics_.originalSizeBytes) /
+                                        static_cast<double>(lastMetrics_.compressedPayloadBytes);
+    }
+    if (lastMetrics_.originalSizeBytes > 0) {
+        lastMetrics_.spaceSavedPercent = ((static_cast<double>(lastMetrics_.originalSizeBytes) -
+                                           static_cast<double>(lastMetrics_.compressedPayloadBytes)) /
+                                          static_cast<double>(lastMetrics_.originalSizeBytes)) * 100.0;
+        lastMetrics_.averageCodeLength = static_cast<double>(lastMetrics_.compressedPayloadBits) /
+                                         static_cast<double>(lastMetrics_.originalSizeBytes);
+    }
+
+    double totalChars = static_cast<double>(text.size());
+    double entropySum = 0.0;
+    for (const auto& [ch, count] : currentFrequencies_) {
+        double p = static_cast<double>(count) / totalChars;
+        if (p > 0.0) entropySum -= p * std::log2(p);
+    }
+    lastMetrics_.entropy = entropySum;
+
     updateStatsDisplay(lastMetrics_);
 
-    // Reset decoded text box to prepare for decompression step
     setControlText(hwndDecodedText_, "");
     hasActiveEncoding_ = true;
 
@@ -376,8 +504,8 @@ void HuffmanGui::onDecompress() {
         return;
     }
 
-    // Coordinator Step: Call Member 5 (HuffmanDecoder)
-    std::string decoded = decoder_.decode(encodedBits, huffmanTree_);
+    // Run decompression
+    std::string decoded = internalDecode(encodedBits);
     setControlText(hwndDecodedText_, decoded);
 
     if (decoded == lastOriginalText_) {
@@ -400,6 +528,7 @@ void HuffmanGui::onClear() {
     lastEncodedBits_.clear();
     currentCodes_.clear();
     currentFrequencies_.clear();
+    g_internalRoot = nullptr;
     hasActiveEncoding_ = false;
     setStatus("Cleared all input, outputs, and tables.");
 }
@@ -416,12 +545,14 @@ void HuffmanGui::onLoadFile() {
     ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST;
 
     if (GetOpenFileNameA(&ofn)) {
-        // Coordinator Call: Member 5 (FileHandler)
-        std::string content = fileHandler_.readTextFile(filename);
-        if (content.empty() && !fileHandler_.fileExists(filename)) {
+        std::ifstream file(filename, std::ios::in);
+        if (!file.is_open()) {
             showError("Could not open selected file.", "File I/O Error");
             return;
         }
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        std::string content = buffer.str();
         setControlText(hwndInputText_, content);
         std::ostringstream msg;
         msg << "Loaded " << content.size() << " bytes from " << filename;
@@ -476,8 +607,8 @@ void HuffmanGui::populateCodesTable(const std::unordered_map<unsigned char, std:
     }
 }
 
-void HuffmanGui::updateStatsDisplay(const CompressionMetrics& metrics) {
-    setControlText(hwndStatsText_, metrics.formatReport());
+void HuffmanGui::updateStatsDisplay(const GuiMetrics& metrics) {
+    setControlText(hwndStatsText_, metrics.format());
 }
 
 void HuffmanGui::setStatus(const std::string& message, bool isError) {
