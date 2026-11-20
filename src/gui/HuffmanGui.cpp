@@ -484,19 +484,6 @@ void HuffmanGui::onCompress() {
 
     updateStatsDisplay(lastMetrics_);
 
-    // Dynamically update section header badges with Before & After sizes
-    std::string inputBadge = "1. Source Text Input (Before: " + std::to_string(lastMetrics_.originalSizeBytes) +
-                             " bytes / " + std::to_string(lastMetrics_.originalSizeBits) + " bits):";
-    SetWindowTextA(lblInput_, inputBadge.c_str());
-
-    std::ostringstream encBadge;
-    encBadge << std::fixed << std::setprecision(1);
-    encBadge << "3. Encoded Bitstream Output (After: " << lastMetrics_.compressedPayloadBytes << " bytes / "
-             << lastMetrics_.compressedPayloadBits << " bits | Saved: " << lastMetrics_.spaceSavedPercent << "%):";
-    SetWindowTextA(lblEncoded_, encBadge.str().c_str());
-
-    SetWindowTextA(lblDecoded_, "4. Reconstructed Decompressed Text (Ready to Decompress):");
-
     setControlText(hwndDecodedText_, "");
     hasActiveEncoding_ = true;
 
@@ -525,10 +512,6 @@ void HuffmanGui::onDecompress() {
     // Run decompression
     std::string decoded = internalDecode(encodedBits);
     setControlText(hwndDecodedText_, decoded);
-
-    std::string decBadge = "4. Reconstructed Decompressed Text (Restored: " +
-                           std::to_string(decoded.size()) + " bytes | 100% Match):";
-    SetWindowTextA(lblDecoded_, decBadge.c_str());
 
     if (decoded == lastOriginalText_) {
         std::ostringstream msg;

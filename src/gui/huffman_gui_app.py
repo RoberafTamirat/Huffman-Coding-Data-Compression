@@ -208,9 +208,9 @@ class HuffmanDesktopApp(tk.Tk):
         container.pack(fill=tk.BOTH, expand=True)
 
         # --------------------------------------------------------------------
-        # 1. Source Text Input (BEFORE COMPRESSION) - Packed at Top
+        # 1. Source Text Input - Packed at Top
         # --------------------------------------------------------------------
-        top_box = tk.LabelFrame(container, text=" 1. Source Text Input (Before Compression) ",
+        top_box = tk.LabelFrame(container, text=" 1. Source Text Input ",
                                 font=("Segoe UI", 10, "bold"), bg="#FFFFFF", fg="#1E293B", padx=10, pady=6)
         top_box.pack(side=tk.TOP, fill=tk.X, pady=(0, 6))
 
@@ -219,12 +219,6 @@ class HuffmanDesktopApp(tk.Tk):
 
         tk.Label(bar, text="Type text below or load from file:", font=("Segoe UI", 9),
                  bg="#FFFFFF", fg="#64748B").pack(side=tk.LEFT)
-
-        # Live Before-Size Badge
-        self.lbl_before_size = tk.Label(bar, text="[ Size Before Compression: 0 bytes (0 bits) ]",
-                                        font=("Segoe UI", 9, "bold"), bg="#EFF6FF", fg="#1D4ED8",
-                                        padx=8, pady=2, relief=tk.SOLID, bd=1)
-        self.lbl_before_size.pack(side=tk.LEFT, padx=12)
 
         tk.Button(bar, text="Clear All", font=("Segoe UI", 9), bg="#EF4444", fg="#FFFFFF",
                   relief=tk.FLAT, padx=10, command=self.on_clear).pack(side=tk.RIGHT, padx=4)
@@ -319,16 +313,9 @@ class HuffmanDesktopApp(tk.Tk):
         middle_pane.add(right_box, minsize=500)
 
         # Encoded Bitstream Box
-        enc_box = tk.LabelFrame(right_box, text=" 3. Encoded Bitstream Output (After Compression) ",
+        enc_box = tk.LabelFrame(right_box, text=" 3. Encoded Bitstream Output (0s & 1s) ",
                                 font=("Segoe UI", 10, "bold"), bg="#FFFFFF", fg="#1E293B", padx=8, pady=6)
         enc_box.pack(fill=tk.BOTH, expand=True, pady=(0, 6))
-
-        enc_top = tk.Frame(enc_box, bg="#FFFFFF")
-        enc_top.pack(fill=tk.X, pady=(0, 2))
-        self.lbl_after_size = tk.Label(enc_top, text="[ Size After Compression: 0 bytes (0 bits) | Saved: 0% ]",
-                                       font=("Segoe UI", 9, "bold"), bg="#ECFDF5", fg="#047857",
-                                       padx=8, pady=2, relief=tk.SOLID, bd=1)
-        self.lbl_after_size.pack(side=tk.LEFT)
 
         self.txt_encoded = tk.Text(enc_box, height=4, font=("Consolas", 10), wrap=tk.CHAR,
                                    bg="#F8FAFC", relief=tk.SOLID, bd=1, padx=6, pady=4)
@@ -341,13 +328,6 @@ class HuffmanDesktopApp(tk.Tk):
         dec_box = tk.LabelFrame(right_box, text=" 4. Reconstructed Decompressed Text ",
                                 font=("Segoe UI", 10, "bold"), bg="#FFFFFF", fg="#1E293B", padx=8, pady=6)
         dec_box.pack(fill=tk.BOTH, expand=True)
-
-        dec_top = tk.Frame(dec_box, bg="#FFFFFF")
-        dec_top.pack(fill=tk.X, pady=(0, 2))
-        self.lbl_decoded_badge = tk.Label(dec_top, text="[ Verification Status: Waiting for Decompress ]",
-                                          font=("Segoe UI", 9, "bold"), bg="#F1F5F9", fg="#475569",
-                                          padx=8, pady=2, relief=tk.SOLID, bd=1)
-        self.lbl_decoded_badge.pack(side=tk.LEFT)
 
         self.txt_decoded = tk.Text(dec_box, height=4, font=("Segoe UI", 10), wrap=tk.WORD,
                                    bg="#F8FAFC", relief=tk.SOLID, bd=1, padx=6, pady=4)
@@ -366,7 +346,6 @@ class HuffmanDesktopApp(tk.Tk):
         text = self.txt_input.get("1.0", tk.END).strip("\r\n")
         byte_len = len(text.encode("utf-8"))
         bit_len = byte_len * 8
-        self.lbl_before_size.config(text=f"[ Size Before Compression: {byte_len} bytes ({bit_len} bits) ]")
         self.lbl_card_before.config(text=f"Original Size: {byte_len} bytes ({bit_len} bits)\nCharacter Count: {len(text)} symbols")
 
     # ========================================================================
@@ -419,14 +398,10 @@ class HuffmanDesktopApp(tk.Tk):
         self.txt_encoded.delete("1.0", tk.END)
         self.txt_encoded.insert(tk.END, self.last_encoded_bits)
 
-        # Step 6: Task 8 Compute Compression Metrics & Before/After Comparison
+        # Step 6: Task 8 Compute Compression Metrics & Part 5 Comparison Cards
         m = CompressionAnalyzer.evaluate(text, self.last_encoded_bits,
                                          self.current_frequencies, self.current_codes)
 
-        # Update Live Badges
-        self.lbl_after_size.config(
-            text=f"[ Size After Compression: {m['payload_bytes']} bytes ({m['payload_bits']} bits) | Saved: {m['space_saved']:.1f}% ]"
-        )
         self.lbl_card_after.config(
             text=f"Compressed: {m['payload_bytes']} bytes ({m['payload_bits']} bits)\nReduction: {m['bytes_saved']} bytes ({m['bits_saved']} bits saved)"
         )
@@ -436,8 +411,6 @@ class HuffmanDesktopApp(tk.Tk):
 
         # Reset decoded display
         self.txt_decoded.delete("1.0", tk.END)
-        self.lbl_decoded_badge.config(text="[ Ready to Decompress: Click Green Button ]",
-                                      bg="#FEF3C7", fg="#92400E")
 
         msg = (f"Compression Completed: {m['orig_bytes']} bytes compressed into "
                f"{m['payload_bytes']} bytes ({m['space_saved']:.1f}% space saved).")
@@ -465,18 +438,10 @@ class HuffmanDesktopApp(tk.Tk):
 
         # Integrity Check
         if decoded == self.last_original_text:
-            self.lbl_decoded_badge.config(
-                text=f"[ Verification PASSED: 100% Lossless Match ({len(decoded.encode('utf-8'))} bytes) ]",
-                bg="#ECFDF5", fg="#065F46"
-            )
             self.status_var.set("Lossless Verification PASSED: Decoded text matches original input 100%!")
             messagebox.showinfo("Verification Passed",
                                 f"Decompression Successful!\nReconstructed text ({len(decoded)} characters) matches the original input 100% losslessly.")
         else:
-            self.lbl_decoded_badge.config(
-                text="[ Verification FAILED: Text Mismatch ]",
-                bg="#FEE2E2", fg="#991B1B"
-            )
             self.status_var.set("Warning: Decompressed text does not match original text.")
 
     def on_clear(self):
@@ -491,10 +456,8 @@ class HuffmanDesktopApp(tk.Tk):
         self.current_codes.clear()
         self.current_frequencies.clear()
         self.update_before_size_badge()
-        self.lbl_after_size.config(text="[ Size After Compression: 0 bytes (0 bits) | Saved: 0% ]")
         self.lbl_card_after.config(text="Compressed: 0 bytes (0 bits)\nReduction: 0 bytes saved")
         self.lbl_card_metrics.config(text="Ratio: 0.00 : 1 | Space Saved: 0.0%\nEntropy: 0.00 | Avg Code: 0.00")
-        self.lbl_decoded_badge.config(text="[ Verification Status: Waiting for Decompress ]", bg="#F1F5F9", fg="#475569")
         self.status_var.set("Cleared all input, outputs, and tables.")
 
     def on_load_file(self):
