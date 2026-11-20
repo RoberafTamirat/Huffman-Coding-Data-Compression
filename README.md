@@ -1,37 +1,36 @@
 # Huffman Coding for Data Compression
 
-A high-performance C++ implementation of the **Huffman Coding algorithm** for lossless text data compression and decompression, featuring both a native **Desktop Graphical User Interface (GUI)** and a **Command-Line Interface (CLI)**.
+A high-performance C++ implementation of the **Huffman Coding algorithm** for lossless text data compression and decompression, featuring a native **Desktop Graphical User Interface (GUI)** and a **Command-Line Interface (CLI)**.
 
 ---
 
-## 👥 Team Members & Roles
+## 👥 Team Members & Role Delegations
 
-| # | Member Name | Assigned Role & Subsystem Focus |
-|---|---|---|
-| **1** | **Roberaf Tamirat** | **GUI Development & Integration Coordinator** |
-| 2 | Marcimoy Assefa | Frequency Analysis & Symbol Encoding |
-| 3 | Mahlet Eyasu | Huffman Tree Construction & Prefix Code Generation |
-| 4 | Bereket Yonatan | Huffman Tree Traversal & Decoding |
-| 5 | Feven Asefa | File I/O Operations & Storage |
-| 6 | Hermela Tadiwos | Compression Statistics & Efficiency Evaluation |
+| # | Member Name | Assigned Role | Expected Files Owned |
+|---|---|---|---|
+| **1** | **Roberaf Tamirat** | **GUI Development & Integration Coordinator** | `HuffmanGui.h`, `HuffmanGui.cpp`, `main.cpp`, `gui_documentation.md` |
+| 2 | Marcimoy Assefa | Frequency Analysis & Documentation Coordinator | `FrequencyAnalyzer.h`, `FrequencyAnalyzer.cpp`, Project Report |
+| 3 | Feven Asefa | Huffman Tree & Priority Queue (Core Algorithm) | `HuffmanNode.h`, `HuffmanTree.h`, `HuffmanTree.cpp` |
+| 4 | Mahlet Eyasu | Huffman Encoding & Bit-Packing | `HuffmanEncoder.h`, `HuffmanEncoder.cpp` |
+| 5 | Hermela Tadios | Decoding & File Management | `HuffmanDecoder.h`, `HuffmanDecoder.cpp`, `FileHandler.h`, `FileHandler.cpp` |
+| 6 | Bereket Yonatan | Testing & Performance Evaluation | `CompressionAnalyzer.h`, `CompressionAnalyzer.cpp`, Unit Tests |
 
 ---
 
 ## 🚀 Key Features
 
-- **Intuitive Desktop GUI**:
+- **Intuitive Desktop GUI (Member 1 - Roberaf Tamirat)**:
   - Multiline text input area with file loading capability.
   - One-click `[Compress Text]` and `[Decompress Text]` actions.
   - Interactive table displaying generated Huffman prefix codes, character frequencies, and bit lengths.
   - Real-time encoded bitstream visualization (`0`s and `1`s).
   - Decompressed original text display with automatic 100% lossless integrity verification.
-  - Comprehensive compression statistics panel (original size, compressed size, compression ratio %, space savings %, Shannon entropy).
+  - Comprehensive compression statistics panel (original size, compressed size, compression ratio, space savings %, Shannon entropy).
+  - Basic input validation and error popups.
 - **Core Algorithmic Engine**:
   - Min-heap priority queue construction for optimal prefix tree building.
   - Variable-length prefix code generation (prefix-free condition).
   - Fast bitstream traversal for exact symbol reconstruction.
-- **Robust Input Validation & Error Handling**:
-  - Visual error alerts for empty inputs, missing trees, or invalid bit sequences.
 - **Cross-Platform CLI**:
   - Full CLI support (`--help`, `--demo`, `-c`, `-d`) for automated testing and benchmarking.
 
@@ -39,7 +38,7 @@ A high-performance C++ implementation of the **Huffman Coding algorithm** for lo
 
 ## 🛠️ Technologies
 - **Language**: C++ (C++17 standard)
-- **GUI Engine**: Native Win32 API & Common Controls (C++) / Tkinter Desktop Runner
+- **GUI Engine**: Native Win32 API & Common Controls (C++)
 - **Build System**: CMake (>= 3.15)
 - **Data Structures**: Binary Trees, Min-Heap Priority Queues, Hash Tables
 
@@ -58,26 +57,28 @@ Huffman-Coding-Data-Compression/
 │   └── input.txt                 # Sample text for testing compression
 ├── include/
 │   ├── core/
-│   │   ├── HuffmanTree.h         # Tree node structure & priority queue interface
-│   │   ├── HuffmanEncoder.h      # Frequency analysis & encoding interface
-│   │   ├── HuffmanDecoder.h      # Bitstream decoding & traversal interface
-│   │   └── CompressionStats.h    # Member 6 compression statistics interface
+│   │   ├── FrequencyAnalyzer.h   # Member 2 (Marcimoy): Frequency analysis interface
+│   │   ├── HuffmanNode.h         # Member 3 (Feven): Node structure & heap comparator
+│   │   ├── HuffmanTree.h         # Member 3 (Feven): Tree building & prefix codes
+│   │   ├── HuffmanEncoder.h      # Member 4 (Mahlet): Bitstream encoding & bit packing
+│   │   ├── HuffmanDecoder.h      # Member 5 (Hermela): Tree traversal & decoding
+│   │   └── CompressionAnalyzer.h # Member 6 (Bereket): Compression evaluation metrics
 │   ├── file/
-│   │   └── FileHandler.h         # Text and binary file I/O operations
+│   │   └── FileHandler.h         # Member 5 (Hermela): File I/O operations
 │   └── gui/
-│       └── HuffmanGui.h          # Win32 desktop GUI header
+│       └── HuffmanGui.h          # Member 1 (Roberaf): Win32 desktop GUI header
 ├── src/
-│   ├── main.cpp                  # Main application entry point (GUI / CLI)
+│   ├── main.cpp                  # Member 1 (Roberaf): Main application entry point
 │   ├── core/
-│   │   ├── HuffmanTree.cpp       # Tree construction & code generation
-│   │   ├── HuffmanEncoder.cpp    # Frequency mapping & bitstream encoding
-│   │   ├── HuffmanDecoder.cpp    # Tree traversal & text reconstruction
-│   │   └── CompressionStats.cpp  # Statistics calculation & formatting
+│   │   ├── FrequencyAnalyzer.cpp # Member 2 (Marcimoy): Frequency analysis implementation
+│   │   ├── HuffmanTree.cpp       # Member 3 (Feven): Tree construction implementation
+│   │   ├── HuffmanEncoder.cpp    # Member 4 (Mahlet): Encoding & bit packing implementation
+│   │   ├── HuffmanDecoder.cpp    # Member 5 (Hermela): Decoding implementation
+│   │   └── CompressionAnalyzer.cpp # Member 6 (Bereket): Efficiency metrics implementation
 │   ├── file/
-│   │   └── FileHandler.cpp       # File read/write implementations
+│   │   └── FileHandler.cpp       # Member 5 (Hermela): File I/O implementations
 │   └── gui/
-│       ├── HuffmanGui.cpp        # Win32 desktop GUI implementation
-│       └── huffman_gui_app.py    # Desktop GUI runner application
+│       └── HuffmanGui.cpp        # Member 1 (Roberaf): Win32 desktop GUI implementation
 └── tests/
     ├── unit/
     │   └── test_huffman.cpp      # Unit tests (Tree, Encoder, Decoder, Stats)
@@ -87,33 +88,27 @@ Huffman-Coding-Data-Compression/
 
 ---
 
-## 💻 How to Run
+## 💻 How to Build & Run
 
-### 1. Running the Desktop GUI
-To launch the interactive Desktop GUI:
+### 1. Build via CMake (MSVC / GCC)
 ```bash
-# Python instant desktop GUI:
-python src/gui/huffman_gui_app.py
-
-# Or run the compiled binary directly (defaults to GUI):
-./build/HuffmanCoding
-# Or explicitly:
-./build/HuffmanCoding --gui
+cmake -B build -S .
+cmake --build build
 ```
 
-### 2. Running the Command-Line Interface (CLI)
+### 2. Run the Application
 ```bash
-# View command help
-./build/HuffmanCoding --help
+# Launch the Desktop GUI (default):
+./build/HuffmanCoding
 
-# Run in-memory end-to-end demonstration & test
+# Launch via explicit flag:
+./build/HuffmanCoding --gui
+
+# Run in-memory demonstration & test:
 ./build/HuffmanCoding --demo
 
-# Compress a text file
-./build/HuffmanCoding -c examples/input.txt compressed_output.txt
-
-# Decompress a file
-./build/HuffmanCoding -d compressed_output.txt decompressed_output.txt
+# View CLI manual:
+./build/HuffmanCoding --help
 ```
 
 ---

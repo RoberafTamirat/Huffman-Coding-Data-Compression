@@ -3,55 +3,43 @@
 #include "core/HuffmanTree.h"
 #include <string>
 #include <unordered_map>
+#include <vector>
+#include <cstdint>
 #include <cstddef>
 
 /**
- * @brief Handles text analysis, frequency calculation, tree generation, and text encoding.
+ * @file HuffmanEncoder.h
+ * @brief Handles prefix code generation, text encoding, and bit-packing into bytes.
+ * @author Member 4: Mahlet Eyasu (Encoding Algorithm Developer)
+ *
+ * Tasks:
+ *  1. Receive HuffmanTree and generate codes mapping.
+ *  2. Encode text into binary bit sequence ('0's and '1's).
+ *  3. Pack encoded bits into bytes (uint8_t) for actual storage.
+ *  4. Track number of valid bits in the final byte.
+ *  5. Handle single unique character input.
  */
 class HuffmanEncoder {
 public:
-    HuffmanEncoder();
+    HuffmanEncoder() = default;
     ~HuffmanEncoder() = default;
 
     /**
-     * @brief Computes frequency count for each distinct character in the text.
-     * @param text Source input text.
-     * @return Map of character to its frequency count.
+     * @brief Encodes source text using the provided codes mapping.
      */
-    [[nodiscard]] std::unordered_map<char, size_t> buildFrequencyTable(const std::string& text);
+    [[nodiscard]] std::string encode(const std::string& text,
+                                     const std::unordered_map<unsigned char, std::string>& codes);
 
     /**
-     * @brief Encodes the provided text into a bit string sequence (e.g. "0110...").
-     * @param text Source input text.
-     * @return Encoded bit representation as a string of '0's and '1's.
+     * @brief Packs a string of '0's and '1's into a vector of bytes.
+     * @param bitString String containing only '0' and '1'.
+     * @param validBitsInLastByte Output parameter recording valid bit count (1-8) in the final byte.
+     * @return Vector of packed bytes.
      */
-    [[nodiscard]] std::string encode(const std::string& text);
+    [[nodiscard]] std::vector<uint8_t> packBits(const std::string& bitString, uint8_t& validBitsInLastByte);
 
     /**
-     * @brief Returns the generated prefix codes mapping.
+     * @brief Unpacks a byte buffer back into a bit string sequence.
      */
-    [[nodiscard]] const std::unordered_map<char, std::string>& getCodes() const noexcept;
-
-    /**
-     * @brief Returns the computed frequency table.
-     */
-    [[nodiscard]] const std::unordered_map<char, size_t>& getFrequencies() const noexcept;
-
-    /**
-     * @brief Returns a reference to the constructed Huffman tree.
-     */
-    [[nodiscard]] const HuffmanTree& getTree() const noexcept;
-
-    /**
-     * @brief Computes compression ratio: (compressed size / original size) * 100.
-     * @param originalBytes Number of bytes in original uncompressed text.
-     * @param compressedBytes Number of bytes in compressed output.
-     * @return Compression ratio percentage.
-     */
-    [[nodiscard]] double calculateCompressionRatio(size_t originalBytes, size_t compressedBytes) const noexcept;
-
-private:
-    HuffmanTree tree_;
-    std::unordered_map<char, size_t> frequencies_;
-    std::unordered_map<char, std::string> codes_;
+    [[nodiscard]] std::string unpackBits(const std::vector<uint8_t>& bytes, uint8_t validBitsInLastByte);
 };

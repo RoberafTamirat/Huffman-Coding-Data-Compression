@@ -12,42 +12,41 @@
 #include <unordered_map>
 #include <memory>
 
-#include "core/HuffmanEncoder.h"
-#include "core/HuffmanDecoder.h"
-#include "core/CompressionStats.h"
-#include "file/FileHandler.h"
+// Integrated modules from team members
+#include "core/FrequencyAnalyzer.h"   // Member 2: Marcimoy Assefa
+#include "core/HuffmanNode.h"          // Member 3: Feven Asefa
+#include "core/HuffmanTree.h"          // Member 3: Feven Asefa
+#include "core/HuffmanEncoder.h"       // Member 4: Mahlet Eyasu
+#include "core/HuffmanDecoder.h"       // Member 5: Hermela Tadios
+#include "file/FileHandler.h"          // Member 5: Hermela Tadios
+#include "core/CompressionAnalyzer.h"  // Member 6: Bereket Yonatan
 
 /**
+ * @file HuffmanGui.h
  * @brief Graphical User Interface for the Huffman Coding Data Compression application.
- * Developed by Roberaf Tamirat (Role 1: GUI Developer & Integration Coordinator).
+ * @author Member 1: Roberaf Tamirat (GUI Developer & Integration Coordinator)
  *
- * Provides full visual interaction:
- *  - Multiline text input area
- *  - Compress & Decompress buttons
- *  - Generated Huffman codes table (List-View)
- *  - Encoded binary bitstream display
- *  - Reconstructed decompressed text display
- *  - Compression statistics panel (Member 6 deliverables)
- *  - Input validation, file loading, and status messages
+ * Responsibilities:
+ *  - Design simple, understandable desktop interface.
+ *  - Text input area & file loading.
+ *  - Compress button & Decompress button.
+ *  - Display Huffman codes table.
+ *  - Display encoded bitstream.
+ *  - Display decompressed original text with 100% lossless verification.
+ *  - Display compression statistics supplied by Member 6.
+ *  - Input validation and error handling.
+ *  - Module integration coordinator.
  */
 class HuffmanGui {
 public:
     HuffmanGui();
     ~HuffmanGui();
 
-    // Prevent accidental copying
     HuffmanGui(const HuffmanGui&) = delete;
     HuffmanGui& operator=(const HuffmanGui&) = delete;
 
 #ifdef _WIN32
-    /**
-     * @brief Launches the desktop application and runs the native Windows event message loop.
-     */
     static int run(HINSTANCE hInstance = nullptr, int nCmdShow = SW_SHOWDEFAULT);
-
-    /**
-     * @brief Win32 Window Procedure dispatcher.
-     */
     static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 #else
     static int run();
@@ -66,14 +65,13 @@ private:
     void onClear();
     void onLoadFile();
 
-    // Helper display updaters
-    void populateCodesTable(const std::unordered_map<char, std::string>& codes,
-                            const std::unordered_map<char, size_t>& freqs);
-    void updateStatsDisplay(const CompressionStats& stats);
+    // UI population helpers
+    void populateCodesTable(const std::unordered_map<unsigned char, std::string>& codes,
+                            const std::unordered_map<unsigned char, size_t>& freqs);
+    void updateStatsDisplay(const CompressionMetrics& metrics);
     void setStatus(const std::string& message, bool isError = false);
     void showError(const std::string& message, const std::string& title = "Validation Notice");
 
-    // UI Utilities
     std::string getControlText(HWND controlHwnd) const;
     void setControlText(HWND controlHwnd, const std::string& text);
 
@@ -90,7 +88,7 @@ private:
     HWND hwndStatsText_{nullptr};
     HWND hwndStatusBar_{nullptr};
 
-    // Label handles for clean resizing
+    // Label handles
     HWND lblInput_{nullptr};
     HWND lblCodes_{nullptr};
     HWND lblEncoded_{nullptr};
@@ -102,13 +100,18 @@ private:
     HFONT hFontBold_{nullptr};
 #endif
 
-    // Core algorithmic modules integrated by Coordinator
-    HuffmanEncoder encoder_;
-    HuffmanDecoder decoder_;
-    FileHandler fileHandler_;
+    // Team member modules integrated by Coordinator (Roberaf)
+    FrequencyAnalyzer frequencyAnalyzer_; // Member 2
+    HuffmanTree huffmanTree_;             // Member 3
+    HuffmanEncoder encoder_;              // Member 4
+    HuffmanDecoder decoder_;              // Member 5
+    FileHandler fileHandler_;             // Member 5
 
+    // State for encode/decode roundtrip
     std::string lastOriginalText_;
     std::string lastEncodedBits_;
-    CompressionStats lastStats_;
+    std::unordered_map<unsigned char, std::string> currentCodes_;
+    std::unordered_map<unsigned char, size_t> currentFrequencies_;
+    CompressionMetrics lastMetrics_;
     bool hasActiveEncoding_{false};
 };

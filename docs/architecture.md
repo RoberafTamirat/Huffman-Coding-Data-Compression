@@ -11,22 +11,22 @@ The application features a modern **Desktop Graphical User Interface (GUI)** for
 
 ```mermaid
 graph TD
-    User([User]) --> GUI[GUI / HuffmanGui Module]
-    User --> CLI[CLI / main.cpp]
+    User([User]) --> GUI[GUI / HuffmanGui Module - Member 1]
+    User --> CLI[CLI / main.cpp - Member 1]
 
-    GUI --> Encoder[HuffmanEncoder Module]
-    GUI --> Decoder[HuffmanDecoder Module]
-    GUI --> Stats[CompressionStats Module]
-    GUI --> FileHandler[FileHandler Module]
+    GUI --> Freq[FrequencyAnalyzer - Member 2]
+    GUI --> Tree[HuffmanTree - Member 3]
+    GUI --> Encoder[HuffmanEncoder - Member 4]
+    GUI --> Decoder[HuffmanDecoder - Member 5]
+    GUI --> FileHandler[FileHandler - Member 5]
+    GUI --> Analyzer[CompressionAnalyzer - Member 6]
 
-    CLI --> FileHandler
+    CLI --> Freq
+    CLI --> Tree
     CLI --> Encoder
     CLI --> Decoder
-    CLI --> Stats
-
-    Encoder --> Tree[HuffmanTree & HuffmanNode]
-    Decoder --> Tree
-    Stats --> Encoder
+    CLI --> Analyzer
+    CLI --> FileHandler
 
     FileHandler --> FS[(File System)]
 ```
@@ -47,26 +47,28 @@ Huffman-Coding-Data-Compression/
 │   └── input.txt               # Sample text for testing compression
 ├── include/
 │   ├── core/
-│   │   ├── HuffmanTree.h       # Tree node structure & tree building interface
-│   │   ├── HuffmanEncoder.h    # Frequency analysis & encoding interface
-│   │   ├── HuffmanDecoder.h    # Bitstream decoding interface
-│   │   └── CompressionStats.h  # Compression metrics & evaluation interface
+│   │   ├── FrequencyAnalyzer.h # Member 2 (Marcimoy): Character frequency analysis
+│   │   ├── HuffmanNode.h       # Member 3 (Feven): Tree node structure & heap comparator
+│   │   ├── HuffmanTree.h       # Member 3 (Feven): Priority queue tree builder & codes
+│   │   ├── HuffmanEncoder.h    # Member 4 (Mahlet): Bitstream encoding & bit packing
+│   │   ├── HuffmanDecoder.h    # Member 5 (Hermela): Tree traversal & decoding
+│   │   └── CompressionAnalyzer.h # Member 6 (Bereket): Compression evaluation metrics
 │   ├── file/
-│   │   └── FileHandler.h       # Text & binary file I/O operations
+│   │   └── FileHandler.h       # Member 5 (Hermela): Text & binary file I/O operations
 │   └── gui/
-│       └── HuffmanGui.h        # Win32 desktop GUI interface
+│       └── HuffmanGui.h        # Member 1 (Roberaf): Win32 desktop GUI interface
 ├── src/
-│   ├── main.cpp                # Application entry point (GUI / CLI dispatch)
+│   ├── main.cpp                # Member 1 (Roberaf): Entry point (GUI / CLI dispatch)
 │   ├── core/
-│   │   ├── HuffmanTree.cpp     # Tree operations & prefix code generation
-│   │   ├── HuffmanEncoder.cpp  # Frequency table & text encoding
-│   │   ├── HuffmanDecoder.cpp  # Bitstream traversal & text reconstruction
-│   │   └── CompressionStats.cpp# Metrics computation & summary formatting
+│   │   ├── FrequencyAnalyzer.cpp # Member 2 (Marcimoy): Frequency counter
+│   │   ├── HuffmanTree.cpp     # Member 3 (Feven): Tree construction implementation
+│   │   ├── HuffmanEncoder.cpp  # Member 4 (Mahlet): Symbol encoding & bit packing
+│   │   ├── HuffmanDecoder.cpp  # Member 5 (Hermela): Bitstream traversal & text reconstruction
+│   │   └── CompressionAnalyzer.cpp # Member 6 (Bereket): Metrics computation & summary
 │   ├── file/
-│   │   └── FileHandler.cpp     # File I/O implementations
+│   │   └── FileHandler.cpp     # Member 5 (Hermela): File I/O implementations
 │   └── gui/
-│       ├── HuffmanGui.cpp      # Win32 desktop GUI implementation
-│       └── huffman_gui_app.py  # Interactive desktop GUI runner
+│       └── HuffmanGui.cpp      # Member 1 (Roberaf): Win32 desktop GUI implementation
 └── tests/
     ├── unit/
     │   └── test_huffman.cpp    # Unit tests for core algorithms & statistics
@@ -80,31 +82,27 @@ Huffman-Coding-Data-Compression/
 
 | Subsystem | Source / Header Files | Primary Responsibilities | Team Focus |
 | :--- | :--- | :--- | :--- |
-| **GUI & Coordinator** | `include/gui/HuffmanGui.h`<br>`src/gui/HuffmanGui.cpp`<br>`src/gui/huffman_gui_app.py` | Desktop UI window, input controls, codes table, bitstream & decompressed text displays, input validation, module integration. | **Member 1 (Roberaf Tamirat)** |
-| **Huffman Tree** | `include/core/HuffmanTree.h`<br>`src/core/HuffmanTree.cpp` | `HuffmanNode` priority queue min-heap construction, recursive tree traversal, prefix code assignment. | **Member 3 (Mahlet Eyasu)** |
-| **Encoder** | `include/core/HuffmanEncoder.h`<br>`src/core/HuffmanEncoder.cpp` | Frequency table computation, encoding text into binary bitstreams. | **Member 2 (Marcimoy Assefa)** |
-| **Decoder** | `include/core/HuffmanDecoder.h`<br>`src/core/HuffmanDecoder.cpp` | Tree traversal driven by bitstreams (`0` for left, `1` for right) to reconstruct original uncompressed text. | **Member 4 (Bereket Yonatan)** |
-| **File I/O** | `include/file/FileHandler.h`<br>`src/file/FileHandler.cpp` | Text/binary file reading/writing, byte buffer conversions, file size checks. | **Member 5 (Feven Asefa)** |
-| **Metrics & Stats** | `include/core/CompressionStats.h`<br>`src/core/CompressionStats.cpp` | Original vs. compressed metrics, compression ratio %, space savings %, entropy. | **Member 6 (Hermela Tadiwos)** |
+| **GUI & Coordinator** | `include/gui/HuffmanGui.h`<br>`src/gui/HuffmanGui.cpp` | Desktop UI window, input controls, codes table, bitstream & decompressed text displays, input validation, module integration. | **Member 1 (Roberaf Tamirat)** |
+| **Frequency Analysis** | `include/core/FrequencyAnalyzer.h`<br>`src/core/FrequencyAnalyzer.cpp` | Frequency table computation, handling letters/numbers/spaces/punctuation, unsigned char mapping. | **Member 2 (Marcimoy Assefa)** |
+| **Huffman Tree** | `include/core/HuffmanNode.h`<br>`include/core/HuffmanTree.h`<br>`src/core/HuffmanTree.cpp` | `HuffmanNode` priority queue min-heap construction, recursive tree traversal, prefix code assignment. | **Member 3 (Feven Asefa)** |
+| **Encoder** | `include/core/HuffmanEncoder.h`<br>`src/core/HuffmanEncoder.cpp` | Text-to-bitstream encoding, packing bits into `uint8_t` bytes, tracking valid bits in final byte. | **Member 4 (Mahlet Eyasu)** |
+| **Decoder & File I/O** | `include/core/HuffmanDecoder.h`<br>`src/core/HuffmanDecoder.cpp`<br>`include/file/FileHandler.h`<br>`src/file/FileHandler.cpp` | Tree traversal driven by bitstreams, text and binary file reading/writing, serialized compressed file storage. | **Member 5 (Hermela Tadios)** |
+| **Testing & Evaluation** | `include/core/CompressionAnalyzer.h`<br>`src/core/CompressionAnalyzer.cpp`<br>`tests/` | Automated test suites, edge cases, compression ratio formula (`Original / Compressed`), space savings % formula. | **Member 6 (Bereket Yonatan)** |
 | **Application Dispatch** | `src/main.cpp` | Command-line argument parsing (`--help`, `--demo`, `-c`, `-d`) & default GUI launch. | **Member 1 (Roberaf Tamirat)** |
-| **Testing & QA** | `tests/unit/`<br>`tests/integration/` | Automated test suites ensuring regression-free changes across modules. | All Members |
 
 ---
 
 ## 5. Build & Execution Instructions
 
 ```bash
-# 1. Run the Desktop GUI directly
-python src/gui/huffman_gui_app.py
-
-# 2. Build via CMake (MSVC / GCC)
+# 1. Build via CMake (MSVC / GCC)
 cmake -B build -S .
 cmake --build build
 
-# 3. Run the compiled binary (launches Desktop GUI by default)
+# 2. Run the compiled binary (launches Desktop GUI by default)
 ./build/HuffmanCoding
 
-# 4. Run CLI demonstration & unit tests
+# 3. Run CLI demonstration & unit tests
 ./build/HuffmanCoding --demo
 ./build/tests/test_huffman
 ./build/tests/test_file_operations

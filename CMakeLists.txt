@@ -15,10 +15,11 @@ endif()
 
 # Core static library shared across CLI, GUI, and test suites
 add_library(huffman_lib STATIC
+    src/core/FrequencyAnalyzer.cpp
     src/core/HuffmanTree.cpp
     src/core/HuffmanEncoder.cpp
     src/core/HuffmanDecoder.cpp
-    src/core/CompressionStats.cpp
+    src/core/CompressionAnalyzer.cpp
     src/file/FileHandler.cpp
     src/gui/HuffmanGui.cpp
 )

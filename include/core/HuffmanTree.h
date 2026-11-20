@@ -1,47 +1,26 @@
 #pragma once
 
+#include "core/HuffmanNode.h"
 #include <memory>
 #include <string>
 #include <unordered_map>
+#include <cstddef>
 
 /**
- * @brief Represents a single node within the Huffman tree.
- */
-struct HuffmanNode {
-    char data;
-    size_t frequency;
-    std::shared_ptr<HuffmanNode> left;
-    std::shared_ptr<HuffmanNode> right;
-
-    HuffmanNode(char character, size_t freq)
-        : data(character), frequency(freq), left(nullptr), right(nullptr) {}
-
-    HuffmanNode(char character, size_t freq, std::shared_ptr<HuffmanNode> leftChild, std::shared_ptr<HuffmanNode> rightChild)
-        : data(character), frequency(freq), left(std::move(leftChild)), right(std::move(rightChild)) {}
-
-    [[nodiscard]] bool isLeaf() const noexcept {
-        return !left && !right;
-    }
-};
-
-/**
- * @brief Comparator functor for min-heap priority queue ordering by frequency.
- */
-struct HuffmanNodeComparator {
-    bool operator()(const std::shared_ptr<HuffmanNode>& lhs, const std::shared_ptr<HuffmanNode>& rhs) const {
-        return lhs->frequency > rhs->frequency;
-    }
-};
-
-/**
- * @brief Manages Huffman tree construction, traversal, and prefix-code generation.
+ * @file HuffmanTree.h
+ * @brief Manages Huffman tree construction, traversal, and prefix code generation.
+ * @author Member 3: Feven Asefa (Core Algorithm Developer - Huffman Tree & Priority Queue)
+ *
+ * Tasks:
+ *  - Implement Min Priority Queue using std::priority_queue.
+ *  - Extract two lowest-frequency nodes, combine into parent, push back.
+ *  - Handle empty input and single-character input.
  */
 class HuffmanTree {
 public:
     HuffmanTree();
     ~HuffmanTree() = default;
 
-    // Disallow accidental expensive copies, allow moves
     HuffmanTree(const HuffmanTree&) = default;
     HuffmanTree& operator=(const HuffmanTree&) = default;
     HuffmanTree(HuffmanTree&&) noexcept = default;
@@ -49,15 +28,15 @@ public:
 
     /**
      * @brief Constructs the Huffman tree from character frequency mappings.
-     * @param frequencies Map containing character counts.
+     * @param frequencies Map containing unsigned char to frequency count.
      */
-    void buildTree(const std::unordered_map<char, size_t>& frequencies);
+    void buildTree(const std::unordered_map<unsigned char, size_t>& frequencies);
 
     /**
      * @brief Traverses the tree to generate prefix binary codes for each leaf.
      * @return Map linking characters to their corresponding bit string representations.
      */
-    [[nodiscard]] std::unordered_map<char, std::string> generateCodes() const;
+    [[nodiscard]] std::unordered_map<unsigned char, std::string> generateCodes() const;
 
     /**
      * @brief Returns the root of the tree.
@@ -65,7 +44,7 @@ public:
     [[nodiscard]] std::shared_ptr<HuffmanNode> getRoot() const noexcept;
 
     /**
-     * @brief Sets or restores the root node (e.g. when deserializing).
+     * @brief Sets or restores the root node.
      */
     void setRoot(std::shared_ptr<HuffmanNode> root) noexcept;
 
@@ -74,5 +53,5 @@ private:
 
     void generateCodesHelper(const std::shared_ptr<HuffmanNode>& node,
                              const std::string& currentCode,
-                             std::unordered_map<char, std::string>& codes) const;
+                             std::unordered_map<unsigned char, std::string>& codes) const;
 };

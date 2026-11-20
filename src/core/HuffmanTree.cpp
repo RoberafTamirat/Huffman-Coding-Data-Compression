@@ -2,15 +2,20 @@
 #include <queue>
 #include <vector>
 
+/**
+ * @file HuffmanTree.cpp
+ * @author Member 3: Feven Asefa
+ */
+
 HuffmanTree::HuffmanTree() : root_(nullptr) {}
 
-void HuffmanTree::buildTree(const std::unordered_map<char, size_t>& frequencies) {
+void HuffmanTree::buildTree(const std::unordered_map<unsigned char, size_t>& frequencies) {
     if (frequencies.empty()) {
         root_ = nullptr;
         return;
     }
 
-    // Min-heap priority queue to store nodes ordered by frequency
+    // Min-heap priority queue configured via std::priority_queue
     std::priority_queue<std::shared_ptr<HuffmanNode>,
                         std::vector<std::shared_ptr<HuffmanNode>>,
                         HuffmanNodeComparator> minHeap;
@@ -19,7 +24,7 @@ void HuffmanTree::buildTree(const std::unordered_map<char, size_t>& frequencies)
         minHeap.push(std::make_shared<HuffmanNode>(character, freq));
     }
 
-    // Build the tree by combining two lowest-frequency nodes repeatedly
+    // Repeatedly combine two lowest-frequency nodes
     while (minHeap.size() > 1) {
         auto left = minHeap.top();
         minHeap.pop();
@@ -35,8 +40,8 @@ void HuffmanTree::buildTree(const std::unordered_map<char, size_t>& frequencies)
     root_ = minHeap.empty() ? nullptr : minHeap.top();
 }
 
-std::unordered_map<char, std::string> HuffmanTree::generateCodes() const {
-    std::unordered_map<char, std::string> codes;
+std::unordered_map<unsigned char, std::string> HuffmanTree::generateCodes() const {
+    std::unordered_map<unsigned char, std::string> codes;
     if (!root_) {
         return codes;
     }
@@ -53,7 +58,7 @@ std::unordered_map<char, std::string> HuffmanTree::generateCodes() const {
 
 void HuffmanTree::generateCodesHelper(const std::shared_ptr<HuffmanNode>& node,
                                       const std::string& currentCode,
-                                      std::unordered_map<char, std::string>& codes) const {
+                                      std::unordered_map<unsigned char, std::string>& codes) const {
     if (!node) {
         return;
     }

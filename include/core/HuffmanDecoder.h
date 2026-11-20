@@ -5,7 +5,16 @@
 #include <memory>
 
 /**
- * @brief Handles decoding of encoded bit strings back into original text using the Huffman tree.
+ * @file HuffmanDecoder.h
+ * @brief Handles decoding of bitstreams back into original text using the Huffman tree.
+ * @author Member 5: Hermela Tadios (Decoding and File Management Developer)
+ *
+ * Tasks:
+ *  1. Receive compressed bitstream.
+ *  2. Traverse HuffmanTree according to each bit ('0' left, '1' right).
+ *  3. Recover original characters.
+ *  4. Handle single-character special case.
+ *  5. Ensure recovered text matches original input.
  */
 class HuffmanDecoder {
 public:
@@ -14,17 +23,11 @@ public:
 
     /**
      * @brief Decodes an encoded bit string using a HuffmanTree instance.
-     * @param encodedBits String of '0's and '1's representing compressed data.
-     * @param tree Huffman tree containing prefix codes.
-     * @return Decoded original text string.
      */
     [[nodiscard]] std::string decode(const std::string& encodedBits, const HuffmanTree& tree);
 
     /**
      * @brief Decodes an encoded bit string starting from a tree root node.
-     * @param encodedBits String of '0's and '1's representing compressed data.
-     * @param root Root node of the Huffman tree.
-     * @return Decoded original text string.
      */
     [[nodiscard]] std::string decode(const std::string& encodedBits, const std::shared_ptr<HuffmanNode>& root);
 };

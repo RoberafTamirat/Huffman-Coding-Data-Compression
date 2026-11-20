@@ -1,5 +1,10 @@
 #include "core/HuffmanDecoder.h"
 
+/**
+ * @file HuffmanDecoder.cpp
+ * @author Member 5: Hermela Tadios
+ */
+
 std::string HuffmanDecoder::decode(const std::string& encodedBits, const HuffmanTree& tree) {
     return decode(encodedBits, tree.getRoot());
 }
@@ -14,7 +19,7 @@ std::string HuffmanDecoder::decode(const std::string& encodedBits, const std::sh
 
     // Special case: Tree has only one distinct character (single leaf node)
     if (currentNode->isLeaf()) {
-        decodedText.append(encodedBits.length(), currentNode->data);
+        decodedText.append(encodedBits.length(), static_cast<char>(currentNode->data));
         return decodedText;
     }
 
@@ -26,12 +31,11 @@ std::string HuffmanDecoder::decode(const std::string& encodedBits, const std::sh
         }
 
         if (!currentNode) {
-            // Malformed bit sequence or unexpected traversal path
-            break;
+            break; // Malformed bit sequence or unexpected traversal path
         }
 
         if (currentNode->isLeaf()) {
-            decodedText += currentNode->data;
+            decodedText += static_cast<char>(currentNode->data);
             currentNode = root;
         }
     }
