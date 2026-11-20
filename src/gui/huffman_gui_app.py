@@ -193,7 +193,7 @@ class HuffmanDesktopApp(tk.Tk):
         header.pack(fill=tk.X, side=tk.TOP)
         header.pack_propagate(False)
 
-        title_lbl = tk.Label(header, text="Huffman Coding Data Compression — Desktop Interface",
+        title_lbl = tk.Label(header, text="Huffman Coding Data Compression",
                              font=("Segoe UI", 14, "bold"), fg="#FFFFFF", bg="#1E3A8A")
         title_lbl.pack(anchor="w", padx=20, pady=12)
 

@@ -25,7 +25,7 @@ The GUI layout is organized into 5 clearly demarcated functional zones designed 
 
 ```text
 +------------------------------------------------------------------------------------------------------+
-|  [Header Banner] Huffman Coding Data Compression System — Roberaf Tamirat (Role 1)                   |
+|  [Header Banner] Huffman Coding Data Compression System                                              |
 +------------------------------------------------------------------------------------------------------+
 |  1. Source Text Input:                                       [📂 Load Text File...]  [ Clear All ]  |
 |  +------------------------------------------------------------------------------------------------+  |
