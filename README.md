@@ -4,15 +4,24 @@ A modular, high-performance C++ implementation of the **Huffman Coding algorithm
 
 ---
 
+## 🎯 Project Objectives
+- Calculate character frequencies (letters, numbers, spaces, punctuation).
+- Construct an optimal Huffman tree using a priority queue (min-heap).
+- Encode text into compact binary prefix bitstreams.
+- Decode compressed data losslessly back to original text.
+- Evaluate compression efficiency (original vs. compressed size, compression ratio, space saved, Shannon entropy).
+
+---
+
 ## 👥 Team Members & Role Delegations
 
 | # | Member Name | Assigned Role | Module Files (Each Member Implements Separately) | Status |
 |---|---|---|---|:---:|
 | **1** | **Roberaf Tamirat** | **GUI Development & Integration Coordinator** | `include/gui/HuffmanGui.h`<br>`src/gui/HuffmanGui.cpp`<br>`src/gui/huffman_gui_app.py`<br>`src/main.cpp`<br>`docs/gui_documentation.md` | **Completed** |
-| 2 | Marcimoy Assefa | Frequency Analysis & Documentation Coordinator | `include/core/FrequencyAnalyzer.h`<br>`src/core/FrequencyAnalyzer.cpp`<br>Project Report | *Pending Member 2* |
+| 2 | Marsimoy Tesfaye | Frequency Analysis & Documentation Coordinator | `include/core/FrequencyAnalyzer.h`<br>`src/core/FrequencyAnalyzer.cpp`<br>Project Report | *Pending Member 2* |
 | 3 | Feven Asefa | Huffman Tree & Priority Queue (Core Algorithm) | `include/core/HuffmanNode.h`<br>`include/core/HuffmanTree.h`<br>`src/core/HuffmanTree.cpp` | *Pending Member 3* |
 | 4 | Mahlet Eyasu | Huffman Encoding & Bit-Packing | `include/core/HuffmanEncoder.h`<br>`src/core/HuffmanEncoder.cpp` | *Pending Member 4* |
-| 5 | Hermela Tadios | Decoding & File Management | `include/core/HuffmanDecoder.h`<br>`src/core/HuffmanDecoder.cpp`<br>`include/file/FileHandler.h`<br>`src/file/FileHandler.cpp` | *Pending Member 5* |
+| 5 | Hermela Tadiwos | Decoding & File Management | `include/core/HuffmanDecoder.h`<br>`src/core/HuffmanDecoder.cpp`<br>`include/file/FileHandler.h`<br>`src/file/FileHandler.cpp` | *Pending Member 5* |
 | 6 | Bereket Yonatan | Testing & Performance Evaluation | `include/core/CompressionAnalyzer.h`<br>`src/core/CompressionAnalyzer.cpp`<br>`tests/` | *Pending Member 6* |
 
 ---
