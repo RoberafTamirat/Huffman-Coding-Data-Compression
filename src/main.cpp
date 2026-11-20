@@ -5,7 +5,6 @@
 void printUsage(const std::string& programName) {
     std::cout << "=========================================================\n"
               << " Huffman Coding Data Compression & Decompression System\n"
-              << " Role 1: GUI Developer & Integration Coordinator (Roberaf Tamirat)\n"
               << "=========================================================\n"
               << "Usage:\n"
               << "  " << programName << "                       Launch Graphical Desktop Interface (GUI)\n"

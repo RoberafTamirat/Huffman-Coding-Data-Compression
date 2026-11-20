@@ -178,7 +178,7 @@ bool HuffmanGui::initialize(HINSTANCE hInstance, int nCmdShow) {
     hwndMain_ = CreateWindowExA(
         0,
         CLASS_NAME,
-        "Huffman Coding Data Compression System — Roberaf Tamirat (Role 1: GUI Developer & Integration Coordinator)",
+        "Huffman Coding Data Compression System",
         WS_OVERLAPPEDWINDOW,
         CW_USEDEFAULT, CW_USEDEFAULT, 1100, 780,
         nullptr, nullptr, hInstance, nullptr
