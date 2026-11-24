@@ -22,6 +22,16 @@ target_include_directories(huffman_gui_lib PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+# Core algorithmic modules library (Group 7 Core Modules)
+# Member 2 (Marsimoy Tesfaye): FrequencyAnalyzer
+add_library(huffman_core_lib STATIC
+    src/core/FrequencyAnalyzer.cpp
+)
+
+target_include_directories(huffman_core_lib PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+)
+
 # Windows system libraries for native Win32 GUI & Common Controls
 if (WIN32)
     target_link_libraries(huffman_gui_lib PUBLIC
@@ -39,4 +49,21 @@ add_executable(HuffmanCoding
 
 target_link_libraries(HuffmanCoding PRIVATE
     huffman_gui_lib
+    huffman_core_lib
 )
+
+# ==============================================================================
+# Testing Targets (Group 7 DAA Verification)
+# ==============================================================================
+enable_testing()
+
+# Automated test executable for FrequencyAnalyzer (Member 2 Deliverable)
+add_executable(test_frequency_analyzer
+    tests/test_frequency_analyzer.cpp
+)
+
+target_link_libraries(test_frequency_analyzer PRIVATE
+    huffman_core_lib
+)
+
+add_test(NAME FrequencyAnalyzerTest COMMAND test_frequency_analyzer)
